@@ -22,7 +22,7 @@ import  pickle
 import os
 import  sys
 from lib import  models
-from config import  config
+from config import  settings
 
 
 
@@ -42,11 +42,11 @@ def create_teacher(admin_obj):
 		teacher_obj=models.Teacher(teacher_name,teacher_age,admin_obj)
 		teacher_list.append(teacher_obj)
 		#判断老师是否存在,如果存在,就更新信息，如果不存在，就创建
-		if os.path.exists(config.TEACHER_DB_DIR):
-			exists_teacher_list=pickle.load(open(config.TEACHER_DB_DIR,'rb'))
+		if os.path.exists(settings.TEACHER_DB_DIR):
+			exists_teacher_list=pickle.load(open(settings.TEACHER_DB_DIR, 'rb'))
 			#批量更新数据(批量添加数据)
 			teacher_list.extend(exists_teacher_list)
-		pickle.dump(teacher_list,open(config.TEACHER_DB_DIR,'wb'))
+		pickle.dump(teacher_list, open(settings.TEACHER_DB_DIR, 'wb'))
 
 def create_course(admin_obj):
 	'''
@@ -55,7 +55,7 @@ def create_course(admin_obj):
 	:return:
 	'''
 	#管理员创建课程前，先把老师全部列出来
-	teacher_list=pickle.load(open(config.TEACHER_DB_DIR,'rb'))
+	teacher_list=pickle.load(open(settings.TEACHER_DB_DIR, 'rb'))
 	for num,item in enumerate(teacher_list,1):
 		print(num,item.name,item.age,item.create_time,item.create_admin.username)
 		#创建课程对象,创建课程列表
@@ -69,10 +69,10 @@ def create_course(admin_obj):
 		course_obj=models.Course(course_name,course_cost,teacher_list[num-1],admin_obj)
 		course_list.append(course_obj)
 		#判断课程是否存在，如果存在，就更新，如果不存在，就创建
-		if os.path.exists(config.COURSE_DB_DIR):
-			exists_course_list=pickle.load(open(config.COURSE_DB_DIR,'rb'))
+		if os.path.exists(settings.COURSE_DB_DIR):
+			exists_course_list=pickle.load(open(settings.COURSE_DB_DIR, 'rb'))
 			course_list.extend(exists_course_list)
-		pickle.dump(course_list,open(config.COURSE_DB_DIR,'wb'))
+		pickle.dump(course_list, open(settings.COURSE_DB_DIR, 'wb'))
 
 
 

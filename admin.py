@@ -21,100 +21,10 @@ import  time
 import  pickle
 import os
 import  sys
+from lib import  models
+from config import  config
 
 
-class Admin:
-	'''封装的管理员的信息'''
-	def __init__(self):
-		'''默认初始化管理员用户名和密码'''
-		self.username=None
-		self.password=None
-
-	def login(self,username,password):
-		'''
-		管理员登录
-		:param username:管理员用户名
-		:param password: 管理员密码
-		:return:
-		'''
-		if self.username==username and self.password==password:
-			return True
-		else:
-			return False
-
-
-	def register(self,user,passwd):
-		'''
-		管理员的注册
-		:param user:注册的管理员用户名
-		:param passwd:注册的管理员密码
-		:return:
-		'''
-		self.username=user
-		self.password=passwd
-		#注册的账号信息序列化到一个文件
-		path=self.username
-		pickle.dump(self,open(path,'xb'))
-
-
-class Teacher:
-	'''封装老师的相关信息'''
-	def __init__(self,name,age,admin):
-		'''
-		:param name: 老师名字
-		:param age: 老师年龄
-		:param admin: 那个管理员创建的老师
-		'''
-		self.name=name
-		self.age=age
-		#老师在程序中的资产
-		self.__assets=0
-		#老师创建时间
-		self.create_time=time.strftime('%Y-%m-%d %H:%M:%S')
-		self.create_admin=admin
-
-	def gain(self,cost):
-		'''
-		老师增加的资产
-		:param cost: 增加的数量
-		:return:
-		'''
-		self.__assets+=cost
-
-
-	def decrease(self,cost):
-		'''
-		老师减少资产
-		:param cost:减少的数量
-		:return:
-		'''
-		self.__assets-=cost
-
-class Course:
-	'''
-	课程相关的信息
-	'''
-	def __init__(self,course_name,cost,teacher_obj,admin_obj):
-		'''
-		:param course_nname: 课程名称
-		:param cost:课时费
-		:param teacher_obj: 课程对应的老师对象(课程由老师带)
-		:param admin_obj:课程对应的管理员(课程由管理员创建)
-		'''
-		self.course_name=course_name
-		self.cost=cost
-		self.teacher=teacher_obj
-		self.create_time=time.strftime('%Y-%m-%d %H:%M:%S')
-		self.create_admin=admin_obj
-
-	def have_lesson(self):
-		'''
-		课程上课，自动给相关联的任课老师增加课时费
-		:return:课程内容返回给上课者
-		'''
-
-class Student:
-	pass
 
 
 def create_teacher(admin_obj):
@@ -129,14 +39,14 @@ def create_teacher(admin_obj):
 		if teacher_name=='q':
 			break
 		teacher_age=int(input('请输入老师年龄:\n'))
-		teacher_obj=Teacher(teacher_name,teacher_age,admin_obj)
+		teacher_obj=models.Teacher(teacher_name,teacher_age,admin_obj)
 		teacher_list.append(teacher_obj)
 		#判断老师是否存在,如果存在,就更新信息，如果不存在，就创建
-		if os.path.exists('teacher_list'):
-			exists_teacher_list=pickle.load(open('teacher_list','rb'))
+		if os.path.exists(config.TEACHER_DB_DIR):
+			exists_teacher_list=pickle.load(open(config.TEACHER_DB_DIR,'rb'))
 			#批量更新数据(批量添加数据)
 			teacher_list.extend(exists_teacher_list)
-		pickle.dump(teacher_list,open('teacher_list','wb'))
+		pickle.dump(teacher_list,open(config.TEACHER_DB_DIR,'wb'))
 
 def create_course(admin_obj):
 	'''
@@ -145,7 +55,7 @@ def create_course(admin_obj):
 	:return:
 	'''
 	#管理员创建课程前，先把老师全部列出来
-	teacher_list=pickle.load(open('teacher_list','rb'))
+	teacher_list=pickle.load(open(config.TEACHER_DB_DIR,'rb'))
 	for num,item in enumerate(teacher_list,1):
 		print(num,item.name,item.age,item.create_time,item.create_admin.username)
 		#创建课程对象,创建课程列表
@@ -156,13 +66,13 @@ def create_course(admin_obj):
 			break
 		course_cost=float(input('请输入课时费:\n'))
 		course_teacher_num=int(input('请选择老师(通过序号选择老师):\n'))
-		course_obj=Course(course_name,course_cost,teacher_list[num-1],admin_obj)
+		course_obj=models.Course(course_name,course_cost,teacher_list[num-1],admin_obj)
 		course_list.append(course_obj)
 		#判断课程是否存在，如果存在，就更新，如果不存在，就创建
-		if os.path.exists('course_list'):
-			exists_course_list=pickle.load(open('course_list','rb'))
+		if os.path.exists(config.COURSE_DB_DIR):
+			exists_course_list=pickle.load(open(config.COURSE_DB_DIR,'rb'))
 			course_list.extend(exists_course_list)
-		pickle.dump(course_list,open('course_list','wb'))
+		pickle.dump(course_list,open(config.COURSE_DB_DIR,'wb'))
 
 
 
@@ -202,7 +112,7 @@ def login(username,password):
 
 def register(username,password):
 	'''管理员的注册方法'''
-	admin_obj = Admin()
+	admin_obj = models.Admin()
 	admin_obj.register(username, password)
 
 
@@ -214,6 +124,11 @@ def main():
 		login(username,password)
 	elif inp==2:
 		register(username,password)
+		inp=input('是否登录y/n？\n')
+		if inp=='y':
+			login(username,password)
+		else:
+			sys.exit(1)
 	else:
 		sys.exit(1)
 

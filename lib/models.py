@@ -95,3 +95,41 @@ class Course:
 		课程上课，自动给相关联的任课老师增加课时费
 		:return:课程内容返回给上课者
 		'''
+
+
+class Student:
+	'''学生相关信息'''
+	def __init__(self):
+		self.username=None
+		self.password=None
+
+		self.course_list=[]
+		self.study_dict={}
+
+	def select_course(self,course_obj):
+		pass
+
+	def login(self,username,password):
+		'''
+		学生登录
+		:param username:学生账户
+		:param password:学生账户密码
+		:return:
+		'''
+		if self.username==username and self.password==password:
+			return True
+		else:
+			return False
+
+	def register(self,username,password):
+		'''
+		学生注册
+		:param username:注册的学生姓名
+		:param password:注册的学生姓名的密码
+		:return:
+		'''
+		self.username=username
+		self.password=password
+
+		path=os.path.join(settings.BASE_STUDENT_DIR,self.username)
+		pickle.dump(self,open(path,'xb'))

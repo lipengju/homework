@@ -16,15 +16,9 @@
     资产+=课时费
 """
 
-import  random
-import  time
-import  pickle
-import os
-import  sys
+import  random,time, pickle ,os,sys
 from lib import  models
 from config import  settings
-
-
 
 
 def create_teacher(admin_obj):
@@ -79,8 +73,8 @@ def create_course(admin_obj):
 def login(username,password):
 	'''管理员的登录方法'''
 	# 登录前判断管理员账号是否存在
-	if os.path.exists(username):
-		admin_obj = pickle.load(open(username, 'rb'))
+	if os.path.exists(os.path.join(settings.BASE_ADMIN_DIR,username)):
+		admin_obj = pickle.load(open(os.path.join(settings.BASE_ADMIN_DIR,username),'rb'))
 		# 对登录判断，登录成功是返回true，失败是false
 		if admin_obj.login(username, password):
 			print('恭喜您，登录成功！')
@@ -109,7 +103,6 @@ def login(username,password):
 		elif inp=='N' or inp=='n':
 			sys.exit(1)
 
-
 def register(username,password):
 	'''管理员的注册方法'''
 	admin_obj = models.Admin()
@@ -124,11 +117,6 @@ def main():
 		login(username,password)
 	elif inp==2:
 		register(username,password)
-		inp=input('是否登录y/n？\n')
-		if inp=='y':
-			login(username,password)
-		else:
-			sys.exit(1)
 	else:
 		sys.exit(1)
 
